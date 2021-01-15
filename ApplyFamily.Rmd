@@ -4,6 +4,7 @@ output:
   html_document:
     toc: yes
     df_print: paged
+    keep_md: true
   github_document:
     theme: cosmo
     toc: yes
