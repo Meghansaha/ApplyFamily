@@ -6,13 +6,14 @@ output:
     toc_float:
       collapsed: yes
       smooth_scroll: yes
-    theme: cosmo
+    theme: flatly
 ---
 
 ```{r setup, eval = TRUE, include=FALSE}
 
 # Setting global options for the document
 knitr::opts_chunk$set( )
+options(width = 500)
 ```
 
 ```{r packages, include = FALSE, echo=FALSE}
@@ -438,7 +439,7 @@ Restaurantvector
 
 <br>
 
-The **sapply()** is a **s**impler version of 'lapply' that works to apply functions across all elements of lists, data frames, and vectors.
+The **sapply()** function is a **s**impler version of 'lapply' that works to apply functions across all elements of lists, data frames, and vectors.
 
 <br>
 
@@ -450,7 +451,7 @@ Where:
 
 ```{r, echo =F}
 Argument <- c("X","FUN","simplify")
-Description <- c("Data Frame, List, Vector","The function you want to be applied to the data frame, list, or vector question", "Determines if the result should be simplified to a vector, matrix, or array")
+Description <- c("Data Frame, List, Vector","The function you want to be applied to the data frame, list, or vector in question", "Determines if the result should be simplified to a vector, matrix, or array")
 sapplyfunctionchart <- tibble(Argument,Description)
 kable(sapplyfunctionchart) %>%
   kable_minimal()
@@ -514,9 +515,142 @@ recordsarray
 ---
 
 # **Tapply Function: tapply()**
-TBC
+
+<br>
+
+**Tapply()** can be used when we want to perform a function over a ragged/jagged array (an array that has more than one dimension with varying lengths). It is best used to apply functions across a vector (or column in a data frame) and producing the result by factors (categories).
+
+<br>
+
+`tapply(X, INDEX, FUN)`
+
+<br>
+
+Where:
+
+```{r, echo =F}
+Argument <- c("X","INDEX","FUN")
+Description <- c("Data Frame or Vector that can be `split` (has factors/categories to split on)","A list or vector of one or more factors or groupings that is the SAME length as X", "The function you want to be applied to the data frame or vector in question")
+tapplyfunctionchart <- tibble(Argument,Description)
+kable(tapplyfunctionchart) %>%
+  kable_minimal()
+```
+
+
+## **Data Frame Example**
+
+We can use `tapply()` to apply a function across a column in a dataframe. Let's make a simple data frame:
+
+```{r tapplyex1}
+# Setting a seed for reproducibility
+set.seed(789)
+
+Teams <- c("UK","USA","Egypt","Ireland","UK","USA","USA")
+Seconds <- runif(length(Teams), min=30, max = 240)
+Runners <- data.frame(Teams,Seconds)
+
+Runners
+
+```
+<br>
+
+Let's say we want to calculate the average time (seconds) for each Team. We can use `tapply()` for this.
+
+<br>
+
+```{r tapplyex2}
+Runner_means <- tapply(Runners$Seconds, Runners$Teams, mean)
+
+Runner_means
+```
+
+<br>
+
+The results are stored into an array. If a new table is desired it can be manipulated to do so:
+
+<br>
+```{r tapplyex3}
+Runners_summary <- data.frame(Team = names(Runner_means), Mean =Runner_means, row.names = NULL)
+
+Runners_summary
+```
+
+
+## **Jagged Vectors Example**
+<br>
+
+We can use `tapply()` to also preform tasks across multiple vectors of different lengths as long as the amount of factors matches the amount of the elements overall in each vector  
+
+<br>
+```{r tapplyex4}
+#Create a list of factors 
+Names <- c("Meghan","Gus","Jennifer","Gus","Jennifer","Natalie","Meghan","Jennifer","Gus","Natalie")
+
+Scores1 <- c(90,67,88,99,100)
+Scores2 <- c(99,99,78)
+Scores3 <- c(100,78)
+
+#Placing them together gives us a vector that has a length of 10. Same as the "Names" vector
+Test_scores <- c(Scores1,Scores2,Scores3)
+
+#We can now apply the same function across this vectors and get summarized results
+Test_averages <- tapply(Test_scores,Names,mean)
+
+Test_averages
+
+```
 
 ---
 
 # **Vapply Function: vapply**
-TBC
+
+
+<br>
+
+**Vapply()** is similar to 'sapply', but you can pre-specify the type of **v**alue that is output, making it a bit faster.
+
+<br>
+
+`vapply(X, INDEX, FUN)`
+
+<br>
+
+Where:
+
+```{r, echo =F}
+Argument <- c("X","FUN","FUN.VALUE")
+Description <- c("Data Frame, List, Vector", "The function you want to be applied to the data frame or vector in question", "A template for the value you want returned")
+vapplyfunctionchart <- tibble(Argument,Description)
+kable(vapplyfunctionchart) %>%
+  kable_minimal()
+```
+
+<br>
+
+So let's look at our `records` data set again. We can use `vapply()` to compute the sum of each group (Cases and Controls) We can use vapply to ensure the result we get is numeric. Vapply is said to be a "safer" alternative to sapply because it will ensure you're getting the results you are expecting. If you don't set the `FUN.VALUE` argument in the function, it will throw an error, whereas sapply would automatically produce a result:
+
+<br>
+
+```{r vapplyex1, error = TRUE}
+
+records
+
+#Using vapply to get the sums. We place a "1" in the numeric argument to tell R we are expecting a non-zero number
+vapply(records, sum, FUN.VALUE = numeric(1))
+
+#Without the FUN.VALUE argument, vapply will throw an error
+vapply(records, sum)
+
+#In comparison, sapply will give us the result without specifying the output type
+sapply(records, sum)
+
+
+```
+
+
+
+``` {r vapplyex2}
+
+
+
+```
